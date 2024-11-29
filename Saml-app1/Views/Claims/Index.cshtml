@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Claims";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>The users Claims</h2>
+        <p>
+            @foreach (var claim in User.Claims)
+            {
+                <strong>@claim.Type</strong> <br /> <span style="padding-left: 10px">Value: @claim.Value</span> <br />
+            }
+        </p>
+    </div>
+</div>

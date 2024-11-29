@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h2>Claims Returned</h2>
+<table id="claims">
+    <tr>
+        <th>Claim Type</th>
+        <th>Claim Value</th>
+    </tr>
+
+    @foreach (var claim in User.Claims)
+    {
+        <tr>
+            <td>@claim.Type</td>
+            <td>@claim.Value</td>
+        </tr>
+    }
+</table>
+
+<h2>Authentication Properties</h2>
+
+<dl>
+    @foreach (var prop in Model.Properties.Items)
+    {
+        <dt>@prop.Key</dt>
+        <dd>@prop.Value</dd>
+    }
+</dl>

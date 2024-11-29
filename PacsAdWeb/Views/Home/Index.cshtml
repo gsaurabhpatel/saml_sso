@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class=”jumbotron”>
+        <h1>Claims Display App</h1>
+    </div>
+
+    <div class=”row”>
+        @{
+            var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+
+            if (claimsIdentity != null)
+            {
+
+                foreach (System.Security.Claims.Claim claim in claimsIdentity.Claims)
+                {
+                    <div>
+                        <div><b>Claim Type: </b>@claim.Type</div>
+                        <div><b>Claim Value: </b>@claim.Value</div>
+                        <div>——————————————-</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <b>Claims are null.</b>
+            }
+        }
+    </div>
+}
