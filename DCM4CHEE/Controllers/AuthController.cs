@@ -1,6 +1,7 @@
 ﻿using DCM4CHEE.Helper;
 using DCM4CHEE.Models;
 using ITfoxtec.Identity.Saml2;
+using ITfoxtec.Identity.Saml2.Claims;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace DCM4CHEE.Controllers
 {
@@ -50,6 +53,22 @@ namespace DCM4CHEE.Controllers
             binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
             await saml2AuthnResponse.CreateSession(HttpContext, claimsTransform: (claimsPrincipal) => ClaimsTransform.Transform(claimsPrincipal));
 
+            var relayState = HttpUtility.UrlDecode(binding.RelayState);
+            Uri.TryCreate(relayState, UriKind.RelativeOrAbsolute, out Uri relayStateUri);
+            if (relayStateUri != null && relayStateUri.IsAbsoluteUri)
+            {
+                var session_token = saml2AuthnResponse.ClaimsIdentity.Claims.Where(c => c.Type == Saml2ClaimTypes.SessionIndex).FirstOrDefault().Value;
+                var login_hint = saml2AuthnResponse.ClaimsIdentity.Claims.Where(c => c.Type == Saml2ClaimTypes.NameId).FirstOrDefault().Value;
+
+                //var url = $"{relayStateUri.AbsoluteUri}" +
+                //    $"?session_token={session_token}" +
+                //    $"&login_hint={login_hint}";
+
+                var url = relayStateUri.AbsoluteUri;
+
+                return Redirect(url);
+            }
+
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
             return Redirect(returnUrl);
@@ -69,13 +88,26 @@ namespace DCM4CHEE.Controllers
             return Redirect("~/");
         }
 
-        [Route("GoToSP")]
-        [Authorize]
-        public IActionResult GoToSP()
-        {
-            var uri = $"{_appSettings.SurgicalPreviewAppUrl}?sso_login={true}";
+        //[Route("GoToSP")]
+        //[Authorize]
+        //public IActionResult GoToSP()
+        //{
+        //    var email = User.Claims.Where(f => f.Type == Saml2ClaimTypes.NameId).Select(s => s.Value).FirstOrDefault();
 
-            return this.Redirect(uri);
-        }
+        //    //var url = $"{_appSettings.SurgicalPreviewAppUrl}" +
+        //    //    $"?sso_login={true}" +
+        //    //    $"&login_hint={email}" +
+        //    //    $"&idp_name=DCM4CHEE Local Saml IdP";
+
+        //    var url = $"{_appSettings.SurgicalPreviewAppUrl}" +
+        //        $"?hospital_name=DCM4CHEE Local Saml IdP";
+
+        //    var url1 = "https://localhost:44325/Home/Index?hospital_name=Pacs SAML IdP";
+
+        //    //var url = "https://localhost:44349/api/sso?name=DCM4CHEE SAML IdP";
+        //    //var url = "https://localhost:44349/api/sso?name=DCM4CHEE Local Saml IdP";
+
+        //    return Redirect(url);
+        //}
     }
 }
