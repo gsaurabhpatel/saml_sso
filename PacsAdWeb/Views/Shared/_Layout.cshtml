@@ -26,7 +26,7 @@
                         <li>@Html.ActionLink("Claims", "Index", "Home")</li>
                         <li>@Html.ActionLink("About", "About", "Home")</li>
                         <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                        <li><a href="@(ConfigurationManager.AppSettings.Get("SurgicalPreviewUrl"))?hospital_name=Hospital1" target="_blank">Go To SP</a></li>
+                        <li><a href="@(ConfigurationManager.AppSettings.Get("SurgicalPreviewUrl"))" target="_blank">Go To SP</a></li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")

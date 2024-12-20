@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    var surgicalPreviewUrl = Configuration.GetSection("Saml2")["SurgicalPreviewUrl"];
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,7 +30,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Claims" asp-action="Index">Claims</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="https://localhost:44325/Home/Index?hospital_name=Hospital_1" target="_blank">Go To SP</a>
+                                <a class="nav-link text-dark" href="@surgicalPreviewUrl" target="_blank">Go To SP</a>
                             </li>
                         </ul>
                         <ul class="navbar-nav">
@@ -70,7 +76,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - SP - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - Hospital 1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
