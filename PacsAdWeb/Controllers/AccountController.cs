@@ -41,16 +41,5 @@ namespace PacsAdWeb.Controllers
 
             return View();
         }
-
-        //public ActionResult GoToSP()
-        //{
-        //    var email = ClaimsPrincipal.Current.Claims.Where(f => f.Type == ClaimTypes.Email).Select(s => s.Value).FirstOrDefault();
-
-        //    string url = $"{ConfigurationManager.AppSettings.Get("SurgicalPreviewUrl")}" +
-        //        $"?sso_login={true}" +
-        //        $"&login_hint={email}";
-
-        //    return Redirect(url);
-        //}
     }
 }
