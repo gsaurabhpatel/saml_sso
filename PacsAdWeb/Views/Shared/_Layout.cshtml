@@ -26,7 +26,7 @@
                         <li>@Html.ActionLink("Claims", "Index", "Home")</li>
                         <li>@Html.ActionLink("About", "About", "Home")</li>
                         <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                        <li><a href="@(ConfigurationManager.AppSettings.Get("SurgicalPreviewUrl"))" target="_blank">Go To SP</a></li>
+                        <li><a href="@(ConfigurationManager.AppSettings.Get("SurgicalPreviewUrl"))&studyUID=1.3.6.1.4.1.39822.3323635864720357910909046071985474438317364656" target="_blank">Go To SP</a></li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")

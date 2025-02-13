@@ -1,10 +1,15 @@
-﻿using EntraIdApp.Helper;
-using ITfoxtec.Identity.Saml2;
+﻿using ITfoxtec.Identity.Saml2;
+using ITfoxtec.Identity.Saml2.Claims;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
+using SamlSSO.Common;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
@@ -13,12 +18,14 @@ namespace EntraIdApp.Controllers
     [Route("Auth")]
     public class AuthController : Controller
     {
+        public IConfiguration _Configuration { get; }
         private const string relayStateReturnUrl = "ReturnUrl";
         private readonly Saml2Configuration config;
 
-        public AuthController(IOptions<Saml2Configuration> configAccessor)
+        public AuthController(IConfiguration configuration, IOptions<Saml2Configuration> configAccessor)
         {
             config = configAccessor.Value;
+            _Configuration = configuration;
         }
 
         [Route("Login")]
@@ -46,7 +53,18 @@ namespace EntraIdApp.Controllers
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
-            return Redirect(returnUrl);
+            if (returnUrl == "app_desktop")
+            {
+                var sessionIndex = saml2AuthnResponse.SessionIndex;
+                var userName = saml2AuthnResponse.NameId.Value;
+                var displayName = saml2AuthnResponse.ClaimsIdentity.Claims.Where(f => f.Type == "http://schemas.microsoft.com/identity/claims/displayname").Select(s => s.Value).FirstOrDefault();
+
+                return RedirectToAction("AppLoginSuccess", "Auth", new { auth_device = returnUrl, session_index = sessionIndex, user_name = userName, display_name = displayName });
+            }
+            else
+            {
+                return Redirect(returnUrl);
+            }
         }
 
         [HttpPost("Logout")]
@@ -61,6 +79,38 @@ namespace EntraIdApp.Controllers
             var binding = new Saml2PostBinding();
             var saml2LogoutRequest = await new Saml2LogoutRequest(config, User).DeleteSession(HttpContext);
             return Redirect("~/");
+        }
+
+
+
+        [Route("AppLogin")]
+        public IActionResult AppLogIn(string auth_device)
+        {
+            var binding = new Saml2RedirectBinding();
+            binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, auth_device ?? Url.Content("~/") } });
+
+            return binding.Bind(new Saml2AuthnRequest(config)).ToActionResult();
+        }
+
+        [Route("AppLoginSuccess")]
+        public IActionResult AppLoginSuccess(string auth_device, string session_index, string user_name, string display_name)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                RegistryKey key = Registry.ClassesRoot.CreateSubKey("HospitalPacs");
+                key.SetValue("", "URL:HospitalPacs");
+                key.SetValue("URL Protocol", "");
+
+                RegistryKey shell = key.CreateSubKey(@"shell\open\command");
+                shell.SetValue("", $"{_Configuration["Saml2:HospitalPacsDesktopAppLocation"]} %1");
+            }
+
+            ViewBag.AuthDevice = auth_device;
+            ViewBag.SessionIndex = session_index;
+            ViewBag.UserName = user_name;
+            ViewBag.DisplayName = display_name;
+
+            return View();
         }
     }
 }

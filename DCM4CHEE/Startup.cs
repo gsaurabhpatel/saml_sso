@@ -1,13 +1,16 @@
 using DCM4CHEE.Models;
 using ITfoxtec.Identity.Saml2;
+using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
+using ITfoxtec.Identity.Saml2.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using System;
 using System.Linq;
 
@@ -15,9 +18,12 @@ namespace DCM4CHEE
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public static IWebHostEnvironment AppEnvironment { get; private set; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            AppEnvironment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -25,16 +31,18 @@ namespace DCM4CHEE
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
             AppSettings appSettings = new();
             new ConfigureFromConfigurationOptions<AppSettings>(Configuration.GetSection("AppSettings")).Configure(appSettings);
             services.AddSingleton(appSettings);
 
-            services.Configure<Saml2Configuration>(Configuration.GetSection("Saml2"));
+            IdentityModelEventSource.ShowPII = true;
 
+            services.Configure<Saml2Configuration>(Configuration.GetSection("Saml2"));
             services.Configure<Saml2Configuration>(saml2Configuration =>
             {
+                saml2Configuration.SigningCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
+                saml2Configuration.DecryptionCertificates.Add(saml2Configuration.SigningCertificate);
+
                 saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
 
                 var entityDescriptor = new EntityDescriptor();
@@ -42,6 +50,7 @@ namespace DCM4CHEE
                 if (entityDescriptor.IdPSsoDescriptor != null)
                 {
                     saml2Configuration.SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location;
+                    saml2Configuration.SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location;
                     saml2Configuration.SignatureValidationCertificates.AddRange(entityDescriptor.IdPSsoDescriptor.SigningCertificates);
                 }
                 else
@@ -49,8 +58,9 @@ namespace DCM4CHEE
                     throw new Exception("IdPSsoDescriptor not loaded from metadata.");
                 }
             });
-
             services.AddSaml2();
+
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

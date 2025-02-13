@@ -1,11 +1,9 @@
 ﻿using ITfoxtec.Identity.Saml2.Claims;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
-namespace DCM4CHEE.Helper
+namespace SamlSSO.Common
 {
     public static class ClaimsTransform
     {

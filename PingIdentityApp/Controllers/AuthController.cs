@@ -3,7 +3,7 @@ using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using PingIdentityApp.Helper;
+using SamlSSO.Common;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;

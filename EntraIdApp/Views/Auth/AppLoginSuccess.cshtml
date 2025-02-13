@@ -1,0 +1,92 @@
+﻿@{
+    Layout = null;
+    var auth_device = ViewBag.AuthDevice;
+    var session_index = ViewBag.SessionIndex;
+    var user_name = ViewBag.UserName;
+    var display_name = ViewBag.DisplayName;
+    var redirectUri = $"HospitalPacs://session?session_index={session_index}&user_name={user_name}&display_name={display_name}";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser Auth - Entra Id</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style type="text/css">
+        body {
+            background: #dcdcdc;
+            font-family: 'Segoe UI';
+        }
+
+        .browser-auth-container {
+            background: #ffffff;
+            text-align: center;
+            margin: 10rem 0 0 0;
+            border-radius: 0.5rem;
+        }
+
+        .browser-auth-content {
+            padding: 30px 15px;
+        }
+
+            .browser-auth-content h1 {
+                font-size: 1.5rem;
+                font-weight: 500;
+                margin-bottom: 2.5rem;
+            }
+
+            .browser-auth-content h4 {
+                font-size: 1rem;
+                font-weight: 400;
+                margin-bottom: 1.5rem;
+            }
+
+            .browser-auth-content p {
+                font-size: .8rem;
+                font-weight: 400;
+                margin: 0;
+            }
+
+        .browser-auth-footer {
+            text-align: center;
+            font-size: .7rem;
+            margin: 8px 0 0;
+        }
+    </style>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            document.getElementById("OpenApp").click();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <div class="browser-auth-container">
+                        <div class="browser-auth-content">
+                            <h1>It’s great to have you aboard, <br />@ViewBag.DisplayName</h1>
+                            <h4>Redirecting you to the Desktop App</h4>
+                            <p>If you aren’t redirected automatically, click <a id="OpenApp" href="@redirectUri">here</a> to open the Desktop App.</p>
+                            <input type="hidden" value="@auth_device" />
+                            <input type="hidden" value="@session_index" />
+                            <input type="hidden" value="@user_name" />
+                            <input type="hidden" value="@display_name" />
+                        </div>
+                    </div>
+                    <p class="browser-auth-footer">&copy; @DateTime.Now.Year - Browser Auth - Entra Id</p>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+        </main>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -9,4 +9,8 @@
     <PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.10.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SamlSSO.Common\SamlSSO.Common.csproj" />
+  </ItemGroup>
+
 </Project>

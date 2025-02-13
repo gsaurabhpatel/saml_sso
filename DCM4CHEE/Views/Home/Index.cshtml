@@ -4,4 +4,9 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
+    @if (((System.Security.Claims.ClaimsIdentity)User.Identity).IsAuthenticated)
+    {
+        <p><strong>@User.Identity.Name</strong></p>
+        <p>Click here to dislay the <a asp-controller="Claims" asp-action="Index">claims</a>.</p>
+    }
 </div>
