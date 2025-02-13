@@ -12,19 +12,32 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Browser Auth - Entra Id</title>
+    <title>Browser Auth - Hospital Pacs</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <style type="text/css">
         body {
-            background: #dcdcdc;
+            background: #f9f9f9;
             font-family: 'Segoe UI';
         }
+
+            body:before {
+                background: linear-gradient(0deg, rgb(0 102 255 / 50%) 0, rgba(255, 180, 0, 0) 100%);
+                content: "";
+                height: 100vh;
+                left: 50%;
+                position: fixed;
+                transform: translateX(-50%) translateY(50%);
+                width: 100%;
+                z-index: -1;
+            }
+
 
         .browser-auth-container {
             background: #ffffff;
             text-align: center;
             margin: 10rem 0 0 0;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 4px 16px -4px rgba(0, 0, 0, .16);
             border-radius: 0.5rem;
         }
 
@@ -67,8 +80,8 @@
     <div class="container">
         <main role="main" class="pb-3">
             <div class="row">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
                     <div class="browser-auth-container">
                         <div class="browser-auth-content">
                             <h1>It’s great to have you aboard, <br />@ViewBag.DisplayName</h1>
@@ -80,9 +93,9 @@
                             <input type="hidden" value="@display_name" />
                         </div>
                     </div>
-                    <p class="browser-auth-footer">&copy; @DateTime.Now.Year - Browser Auth - Entra Id</p>
+                    <p class="browser-auth-footer">&copy; @DateTime.Now.Year - Browser Auth - Hospital Pacs</p>
                 </div>
-                <div class="col-md-4"></div>
+                <div class="col-md-3"></div>
             </div>
         </main>
     </div>

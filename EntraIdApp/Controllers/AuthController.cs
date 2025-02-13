@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 using SamlSSO.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,14 +19,14 @@ namespace EntraIdApp.Controllers
     [Route("Auth")]
     public class AuthController : Controller
     {
-        public IConfiguration _Configuration { get; }
+        public IConfiguration Configuration { get; }
         private const string relayStateReturnUrl = "ReturnUrl";
         private readonly Saml2Configuration config;
 
         public AuthController(IConfiguration configuration, IOptions<Saml2Configuration> configAccessor)
         {
             config = configAccessor.Value;
-            _Configuration = configuration;
+            Configuration = configuration;
         }
 
         [Route("Login")]
@@ -102,7 +103,7 @@ namespace EntraIdApp.Controllers
                 key.SetValue("URL Protocol", "");
 
                 RegistryKey shell = key.CreateSubKey(@"shell\open\command");
-                shell.SetValue("", $"{_Configuration["Saml2:HospitalPacsDesktopAppLocation"]} %1");
+                shell.SetValue("", $"{Configuration["Saml2:HospitalPacsDesktopAppLocation"]} %1");
             }
 
             ViewBag.AuthDevice = auth_device;
